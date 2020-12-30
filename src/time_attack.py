@@ -2,6 +2,7 @@ from typing import cast
 import requests as r;
 import time;
 import csv;
+from requests.exceptions import ConnectionError;
 
 # La idea es hacer el request con un password falopa.
 # Si el proceso de login está escrito medio como el orto, van a validar el username y 
@@ -47,11 +48,11 @@ for user in times:
         if(request_time > largest_time):
             largest_time = request_time
         time.sleep(0.1) #esto no entendi muy bien el porque, TODO research
-    except e:
-        print("Error " + str(e)
+    except ConnectionError as e:
+        print("Error de conexion contra la API: " + str(e))
 
-print("Largest time: ",str(largest_time),"\n");
-print("Psigma: ",str(psigma),"\n")
+print("Largest time: ",str(largest_time))
+print("Psigma: ",str(psigma))
 
 #Ahora veo cuales son usernames candidatos.
 candidatos = open("output/candidatos.txt","w");
